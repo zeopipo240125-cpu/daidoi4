@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tóm tắt Truyền thống Đại đội Pháo Phòng không 4 (PPK 4) - Anh Hùng LLVTND</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'flag-red': '#DA251D',
+                        'flag-yellow': '#FFFF00',
+                        'gold-star': '#FFD700',
+                        'airforce-blue': '#0D2B45',
+                        'sky-dark': '#0B1E2D',
+                        'military-green': '#203A17',
+                        'army-olive': '#355E3B',
+                        'camo-light': '#4E7C4F',
+                        'cream-paper': '#F9F8F3',
+                    },
+                    fontFamily: {
+                        serif: ['"Times New Roman"', 'Times', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Font Times New Roman bắt buộc toàn trang */
+        * {
+            font-family: "Times New Roman", Times, serif !important;
+        }
+
+        body {
+            background-color: #0B1E2D;
+            color: #1A1A1A;
+            overflow-x: hidden;
+        }
+
+        /* Pattern ngụy trang quân đội làm họa tiết nhẹ */
+        .camo-texture {
+            background-color: #0d273a;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(32, 58, 23, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(53, 94, 59, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(13, 43, 69, 0.6) 0%, transparent 60%);
+        }
+
+        /* Lưới tọa độ phòng không */
+        .grid-radar {
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 255, 128, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 255, 128, 0.05) 1px, transparent 1px);
+        }
+
+        .gold-border-box {
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .red-gold-gradient {
+            background: linear-gradient(135deg, #B71C1C 0%, #DA251D 50%, #8B0000 100%);
+        }
+
+        .military-card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(5px);
+            border-top: 4px solid #203A17;
+        }
+
+        /* Hiệu ứng tia Radar quét */
+        @keyframes radar-sweep {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .radar-sweeper {
+            animation: radar-sweep 8s linear infinite;
+            transform-origin: center center;
+        }
+
+        /* Timeline connector line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 3px;
+            background: linear-gradient(to bottom, #FFD700, #355E3B, #DA251D);
+            transform: translateX(-50%);
+        }
+
+        @media (max-width: 768px) {
+            .timeline-line::before {
+                left: 24px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-sky-dark text-gray-900 leading-relaxed font-serif selection:bg-flag-yellow selection:text-flag-red">
+
+    <!-- CANVAS NỀN HIỆU ỨNG RADAR & BẦU TRỜI PHÒNG KHÔNG -->
+    <canvas id="airDefenseCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-40"></canvas>
+
+    <div class="relative z-10 grid-radar camo-texture min-h-screen">
+
+        <!-- HEADER TRANG TRỌNG -->
+        <header class="sticky top-0 z-50 bg-military-green/95 text-white border-b-4 border-gold-star shadow-2xl backdrop-blur">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <!-- Ngôi sao vàng trên nền cờ đỏ -->
+                    <div class="w-10 h-10 bg-flag-red rounded-full border-2 border-gold-star flex items-center justify-center shadow-lg shrink-0">
+                        <svg class="w-6 h-6 text-gold-star fill-current" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base md:text-xl text-gold-star uppercase tracking-wider">ĐẠI ĐỘI PHÁO PHÒNG KHÔNG 4</h1>
+                        <p class="text-xs text-green-200 italic">Trung đoàn 224 - Sư đoàn 375 - Quân chủng PK-KQ</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 text-sm font-bold text-amber-200 uppercase">
+                    <a href="#lich-su" class="hover:text-gold-star transition">Lịch sử</a>
+                    <a href="#chieu-dau" class="hover:text-gold-star transition">Chiến công</a>
+                    <a href="#anh-hung" class="hover:text-gold-star transition">Tô Vĩnh Diện</a>
+                    <a href="#thanh-tich" class="hover:text-gold-star transition">Thành tích</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- HERO BANNER: BIỂU TƯỢNG BẢO VỆ BẦU TRỜI TỔ QUỐC -->
+        <section class="relative text-white py-16 md:py-24 px-4 overflow-hidden border-b-4 border-gold-star">
+            <div class="max-w-5xl mx-auto text-center relative z-10 space-y-6">
+                
+                <!-- Khung biểu tượng pháo phòng không & rada -->
+                <div class="inline-block relative">
+                    <div class="w-28 h-28 md:w-36 md:h-36 mx-auto bg-military-green/80 rounded-full border-4 border-gold-star p-2 shadow-2xl relative flex items-center justify-center">
+                        <!-- Radar quét SVG -->
+                        <svg class="w-full h-full text-green-400 opacity-60" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3,3"/>
+                            <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="1"/>
+                            <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" stroke-width="1"/>
+                            <line x1="50" y1="5" x2="50" y2="95" stroke="currentColor" stroke-width="0.8"/>
+                            <line x1="5" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="0.8"/>
+                            <g class="radar-sweeper">
+                                <path d="M50 50 L95 50 A45 45 0 0 0 50 5 Z" fill="rgba(0, 255, 128, 0.25)"/>
+                            </g>
+                        </svg>
+                        <!-- Pháo phòng không chính giữa -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gold-star drop-shadow" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L1 21h22L12 2zm0 3.8L18.8 19H5.2L12 5.8z"/>
+                                <path d="M11 9h2v7h-2z"/>
+                                <circle cx="12" cy="18" r="1" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <span class="inline-block bg-flag-red text-gold-star text-xs md:text-sm font-bold uppercase px-4 py-1.5 rounded-full border border-gold-star shadow">
+                        ĐƠN VỊ ANH HÙNG LỰC LƯỢNG VŨ TRANG NHÂN DÂN
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-black uppercase tracking-wide text-gold-star drop-shadow-md leading-tight">
+                        TÓM TẮT TRUYỀN THỐNG<br/>ĐẠI ĐỘI PHÁO PHÒNG KHÔNG 4
+                    </h2>
+                    <div class="w-36 h-1 bg-gold-star mx-auto"></div>
+                    <p class="text-base md:text-xl text-gray-200 max-w-3xl mx-auto italic font-medium leading-relaxed">
+                        "Cảnh giác cao, sẵn sàng chiến đấu tốt, quản lý chặt chẽ vùng trời, bảo vệ vững chắc thành phố Đà Nẵng và bầu trời Tổ quốc"
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="max-w-5xl mx-auto px-4 py-12 space-y-16">
+
+            <!-- THÀNH LẬP & PHIÊN HIỆU -->
+            <section id="lich-su" class="military-card rounded-xl p-6 md:p-10 shadow-2xl border-2 border-gold-star/40">
+                <div class="flex items-center space-x-3 mb-6 border-b-2 border-military-green pb-3">
+                    <div class="w-8 h-8 bg-flag-red text-gold-star rounded-full flex items-center justify-center font-bold text-lg shadow">1</div>
+                    <h3 class="text-2xl md:text-3xl font-bold text-military-green uppercase">Ngày Thành Lập & Quá Trình Đổi Phiên Hiệu</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <div class="md:col-span-8 space-y-4 text-gray-800 text-lg leading-relaxed text-justify">
+                        <p class="bg-amber-50 p-4 rounded-lg border-l-4 border-flag-red shadow-sm">
+                            <strong class="text-flag-red font-bold">Đại đội Pháo Phòng không 4</strong> được thành lập ngày 
+                            <strong class="text-flag-red bg-yellow-100 px-2 py-0.5 rounded border border-amber-300">01/4/1953</strong> 
+                            tại xã Bộc Nhiêu, huyện Định Hóa, tỉnh Thái Nguyên.
+                        </p>
+                        <p>
+                            Ban đầu, đơn vị mang phiên hiệu <strong class="text-military-green">Đại đội 827</strong> thuộc 
+                            <strong class="text-military-green">Tiểu đoàn 394, Trung đoàn 367</strong> (Trung đoàn Pháo phòng không đầu tiên của Quân đội nhân dân Việt Nam).
+                        </p>
+                        <p>
+                            Đến <strong class="text-military-green">tháng 4/1958</strong>, đơn vị chính thức đổi phiên hiệu thành 
+                            <strong class="text-flag-red font-bold">Đại đội 4 thuộc Tiểu đoàn 14, Trung đoàn 224</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Khung đồ họa Trận địa phòng không -->
+                    <div class="md:col-span-4 bg-military-green text-white p-5 rounded-xl border-2 border-gold-star shadow-inner text-center space-y-3">
+                        <div class="text-gold-star text-4xl font-bold">1953</div>
+                        <div class="text-xs uppercase tracking-widest text-green-200">Khởi đầu từ Chiến khu Việt Bắc</div>
+                        <hr class="border-green-600"/>
+                        <p class="text-sm italic text-gray-200">
+                            Góp phần đặt nền móng truyền thống đánh thắng ngay từ trận đầu của lực lượng Pháo phòng không Việt Nam.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHẶNG ĐƯỜNG CHIẾN ĐẤU (TIMELINE) -->
+            <section id="chieu-dau" class="space-y-8">
+                <div class="military-card rounded-xl p-6 md:p-8 shadow-2xl border-2 border-gold-star/40">
+                    <div class="flex items-center space-x-3 border-b-2 border-military-green pb-3">
+                        <div class="w-8 h-8 bg-flag-red text-gold-star rounded-full flex items-center justify-center font-bold text-lg shadow">2</div>
+                        <h3 class="text-2xl md:text-3xl font-bold text-military-green uppercase">Chặng Đường Chiến Đấu Hào Hùng</h3>
+                    </div>
+
+                    <div class="relative timeline-line mt-10 mb-6 space-y-8">
+
+                        <!-- Item 1 -->
+                        <div class="relative flex flex-col md:flex-row items-center md:justify-between group">
+                            <div class="flex items-center w-full md:w-1/2 md:pr-10 md:text-right order-2 md:order-1">
+                                <div class="w-full bg-cream-paper p-5 rounded-lg shadow-md border-l-4 md:border-l-0 md:border-r-4 border-military-green">
+                                    <span class="inline-block bg-military-green text-gold-star text-xs font-bold px-3 py-1 rounded mb-2">1961 - 1962</span>
+                                    <h4 class="font-bold text-xl text-flag-red">Nhiệm Vụ Quốc Tế & Bảo Vệ Hà Nội</h4>
+                                    <p class="text-gray-700 text-base mt-2">
+                                        Tham gia chiến đấu kiên cường tại nước bạn Lào, sau đó cơ động về bảo vệ vùng trời Thủ đô Hà Nội và các tỉnh lân cận.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="absolute left-6 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gold-star border-4 border-military-green rounded-full z-10 flex items-center justify-center order-1 md:order-2 mb-4 md:mb-0 shadow">
+                                <div class="w-2.5 h-2.5 bg-flag-red rounded-full"></div>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-10 order-3 hidden md:block"></div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="relative flex flex-col md:flex-row items-center md:justify-between group">
+                            <div class="w-full md:w-1/2 md:pr-10 order-3 hidden md:block"></div>
+                            <div class="absolute left-6 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gold-star border-4 border-military-green rounded-full z-10 flex items-center justify-center order-1 md:order-2 mb-4 md:mb-0 shadow">
+                                <div class="w-2.5 h-2.5 bg-flag-red rounded-full"></div>
+                            </div>
+                            <div class="flex items-center w-full md:w-1/2 md:pl-10 order-2 md:order-3">
+                                <div class="w-full bg-cream-paper p-5 rounded-lg shadow-md border-l-4 border-military-green">
+                                    <span class="inline-block bg-military-green text-gold-star text-xs font-bold px-3 py-1 rounded mb-2">1969 - 1973</span>
+                                    <h4 class="font-bold text-xl text-flag-red">Bảo Vệ Huyết Mạch Đường 20 Quyết Thắng</h4>
+                                    <p class="text-gray-700 text-base mt-2">
+                                        Trực tiếp chiến đấu bảo vệ giao thông vận tải trên tuyến Đường 20 – "tọa độ lửa" trọng điểm bắn phá ác liệt của Không quân Mỹ.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="relative flex flex-col md:flex-row items-center md:justify-between group">
+                            <div class="flex items-center w-full md:w-1/2 md:pr-10 md:text-right order-2 md:order-1">
+                                <div class="w-full bg-cream-paper p-5 rounded-lg shadow-md border-l-4 md:border-l-0 md:border-r-4 border-military-green">
+                                    <span class="inline-block bg-military-green text-gold-star text-xs font-bold px-3 py-1 rounded mb-2">Năm 1974</span>
+                                    <h4 class="font-bold text-xl text-flag-red">Chốt Giữ Bảo Vệ Tuyến Đường 1 Bắc</h4>
+                                    <p class="text-gray-700 text-base mt-2">
+                                        Hành quân ra miền Bắc, chốt giữ kiên cường, bảo vệ an toàn tuyến mạch máu giao thông chiến lược Đường 1 Bắc.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="absolute left-6 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gold-star border-4 border-military-green rounded-full z-10 flex items-center justify-center order-1 md:order-2 mb-4 md:mb-0 shadow">
+                                <div class="w-2.5 h-2.5 bg-flag-red rounded-full"></div>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-10 order-3 hidden md:block"></div>
+                        </div>
+
+                        <!-- Item 4 -->
+                        <div class="relative flex flex-col md:flex-row items-center md:justify-between group">
+                            <div class="w-full md:w-1/2 md:pr-10 order-3 hidden md:block"></div>
+                            <div class="absolute left-6 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gold-star border-4 border-flag-red rounded-full z-10 flex items-center justify-center order-1 md:order-2 mb-4 md:mb-0 shadow">
+                                <div class="w-2.5 h-2.5 bg-gold-star rounded-full"></div>
+                            </div>
+                            <div class="flex items-center w-full md:w-1/2 md:pl-10 order-2 md:order-3">
+                                <div class="w-full bg-cream-paper p-5 rounded-lg shadow-md border-l-4 border-flag-red">
+                                    <span class="inline-block bg-flag-red text-gold-star text-xs font-bold px-3 py-1 rounded mb-2">Đầu năm 1975</span>
+                                    <h4 class="font-bold text-xl text-flag-red">Hành Quân Thần Tốc Giải Phóng Miền Nam</h4>
+                                    <p class="text-gray-700 text-base mt-2">
+                                        Nằm trong đội hình Quân binh chủng hợp thành, tham gia chiến dịch thần tốc giải phóng hoàn toàn Miền Nam, thống nhất Đất nước.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 5 -->
+                        <div class="relative flex flex-col md:flex-row items-center md:justify-between group">
+                            <div class="flex items-center w-full md:w-1/2 md:pr-10 md:text-right order-2 md:order-1">
+                                <div class="w-full bg-amber-50 p-5 rounded-lg shadow-md border-l-4 md:border-l-0 md:border-r-4 border-military-green border-2 border-amber-200">
+                                    <span class="inline-block bg-military-green text-gold-star text-xs font-bold px-3 py-1 rounded mb-2">Từ 04/1975 - Nay</span>
+                                    <h4 class="font-bold text-xl text-military-green">Quản Lý Vùng Trời & Bảo Vệ Thành Phố Đà Nẵng</h4>
+                                    <p class="text-gray-700 text-base mt-2">
+                                        Liên tục duy trì nghiêm chế độ sẵn sàng chiến đấu, quản lý vững chắc vùng trời, bảo vệ an toàn tuyệt đối Thành phố Đà Nẵng.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="absolute left-6 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-flag-red border-4 border-gold-star rounded-full z-10 flex items-center justify-center order-1 md:order-2 mb-4 md:mb-0 shadow">
+                                <div class="w-2.5 h-2.5 bg-gold-star rounded-full"></div>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-10 order-3 hidden md:block"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- TẤM GƯƠNG ANH HÙNG LIỆT SỸ TÔ VĨNH DIỆN -->
+            <section id="anh-hung" class="red-gold-gradient text-white p-8 md:p-10 rounded-xl shadow-2xl gold-border-box relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                    <div class="shrink-0 text-center">
+                        <div class="w-28 h-28 md:w-36 md:h-36 mx-auto bg-military-green rounded-full border-4 border-gold-star flex items-center justify-center shadow-2xl">
+                            <svg class="w-16 h-16 text-gold-star" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <span class="inline-block mt-3 bg-gold-star text-flag-red font-bold text-xs uppercase px-3 py-1 rounded-full">Anh Hùng LLVTND</span>
+                    </div>
+                    <div class="space-y-3 text-center md:text-left">
+                        <h3 class="text-3xl md:text-4xl font-black text-gold-star uppercase tracking-wide">Liệt Sỹ TÔ VĨNH DIỆN</h3>
+                        <p class="text-xl italic font-medium text-yellow-100 border-l-4 border-gold-star pl-4 py-1 my-2">
+                            Tấm gương lấy thân mình chèn pháo bất tử – Biểu tượng sáng ngời của Khẩu đội Pháo phòng không Việt Nam.
+                        </p>
+                        <p class="text-base md:text-lg text-gray-100 leading-relaxed">
+                            Đại đội 4 vinh dự và tự hào có <strong class="text-gold-star font-bold text-xl">01 cá nhân được Nhà nước tuyên dương Danh hiệu Anh hùng Lực lượng Vũ trang Nhân dân</strong>: Liệt sỹ Tô Vĩnh Diện. Tinh thần của Anh là nguồn sức mạnh tinh thần to lớn cho mọi thế hệ cán bộ, chiến sĩ đơn vị.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- THÀNH TÍCH VÀ CHIẾN CÔNG TIÊU BIỂU -->
+            <section id="thanh-tich" class="space-y-8">
+                <div class="military-card rounded-xl p-6 md:p-8 shadow-2xl border-2 border-gold-star/40 space-y-8">
+                    <div class="flex items-center space-x-3 border-b-2 border-military-green pb-3">
+                        <div class="w-8 h-8 bg-flag-red text-gold-star rounded-full flex items-center justify-center font-bold text-lg shadow">3</div>
+                        <h3 class="text-2xl md:text-3xl font-bold text-military-green uppercase">Thành Tích & Chiến Công Tiêu Biểu</h3>
+                    </div>
+
+                    <!-- Khối Danh hiệu Anh hùng LLVTND Tập thể -->
+                    <div class="bg-gradient-to-r from-military-green to-army-olive text-white p-6 md:p-8 rounded-xl border-2 border-gold-star shadow-xl relative">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div class="space-y-2 text-center md:text-left">
+                                <span class="bg-flag-red text-gold-star font-bold text-xs uppercase px-3 py-1 rounded border border-gold-star">Phong Tặng Danh Hiệu Cao Quý</span>
+                                <h4 class="text-2xl md:text-3xl font-bold text-gold-star">DANH HIỆU ANH HÙNG LLVTND TẬP THỂ</h4>
+                                <p class="text-gray-200 text-base leading-relaxed">
+                                    Với những thành tích đặc biệt xuất sắc đạt được, ngày <strong class="text-white">16/12/2014</strong>, Đại đội 4 đã được Nhà nước phong tặng Danh hiệu <strong class="text-gold-star">Anh hùng Lực lượng Vũ trang Nhân dân</strong>. Đơn vị long trọng tổ chức lễ đón nhận vào ngày <strong class="text-white">27/02/2015</strong>.
+                                </p>
+                            </div>
+                            <div class="shrink-0">
+                                <div class="w-20 h-20 bg-flag-red rounded-full border-4 border-gold-star flex items-center justify-center shadow-lg">
+                                    <svg class="w-12 h-12 text-gold-star" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2L9 9H2l6 4.5L5.5 21 12 16.5 18.5 21 16 13.5 22 9h-7z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Con số ấn tượng -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-amber-50 p-6 rounded-xl border-t-4 border-flag-red text-center shadow">
+                            <div class="text-4xl font-black text-flag-red mb-1">> 2.500</div>
+                            <div class="text-sm font-bold uppercase text-military-green">Trận Chiến Đấu</div>
+                            <p class="text-xs text-gray-600 mt-2">Dũng cảm kiên cường đối mặt với các loại hỏa lực hiện đại của kẻ thù.</p>
+                        </div>
+                        <div class="bg-amber-50 p-6 rounded-xl border-t-4 border-gold-star text-center shadow">
+                            <div class="text-4xl font-black text-military-green mb-1">13 Máy Bay</div>
+                            <div class="text-sm font-bold uppercase text-flag-red">Bắn Rơi (Pháp & Mỹ)</div>
+                            <p class="text-xs text-gray-600 mt-2">Góp phần giữ vững bầu trời quê hương trong cả hai cuộc kháng chiến.</p>
+                        </div>
+                        <div class="bg-amber-50 p-6 rounded-xl border-t-4 border-military-green text-center shadow">
+                            <div class="text-4xl font-black text-flag-red mb-1">16 Huân Chương</div>
+                            <div class="text-sm font-bold uppercase text-military-green">Huân Chương Chiến Công</div>
+                            <p class="text-xs text-gray-600 mt-2">Cùng nhiều cờ thi đua và bằng khen các cấp trao tặng.</p>
+                        </div>
+                    </div>
+
+                    <!-- Khen thưởng từ 1992 đến nay -->
+                    <div class="bg-white p-6 rounded-xl border border-amber-300 shadow-inner space-y-4">
+                        <h4 class="text-xl font-bold text-military-green border-b pb-2 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-flag-red" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            Thành Tích Trong Thời Kỳ Mới (Từ năm 1992 đến nay)
+                        </h4>
+                        <ul class="space-y-3 text-base text-gray-800">
+                            <li class="flex items-start gap-3">
+                                <span class="text-flag-red font-bold text-lg">✓</span>
+                                <span>Nhiều năm liền liên tục đạt danh hiệu <strong class="text-flag-red">Đơn vị Quyết thắng</strong>.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-flag-red font-bold text-lg">✓</span>
+                                <span>Chi bộ liên tục đạt tiêu chuẩn <strong class="text-military-green">Hoàn thành xuất sắc nhiệm vụ (HTXSNV)</strong>.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-flag-red font-bold text-lg">✓</span>
+                                <span>Tham gia hội thao, bắn đạn thật hàng năm đều <strong class="text-flag-red">tiêu diệt mục tiêu ngay từ những loạt đạn đầu</strong>, liên tục được vinh danh và tặng cờ <strong class="text-military-green">Đơn vị bắn giỏi</strong>.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER TRANG TRỌNG -->
+        <footer class="bg-military-green text-amber-100 border-t-4 border-gold-star py-10">
+            <div class="max-w-5xl mx-auto px-4 text-center space-y-4">
+                <div class="flex justify-center items-center space-x-3 text-gold-star">
+                    <span class="w-12 h-0.5 bg-gold-star"></span>
+                    <h5 class="text-lg font-bold uppercase tracking-widest">ĐẠI ĐỘI PHÁO PHÒNG KHÔNG 4</h5>
+                    <span class="w-12 h-0.5 bg-gold-star"></span>
+                </div>
+                <p class="text-sm text-green-200 max-w-2xl mx-auto">
+                    Trung đoàn 224 - Sư đoàn 375 - Quân chủng Phòng không - Không quân<br/>
+                    Phát huy truyền thống Đơn vị Anh hùng – Quyết tâm bảo vệ vững chắc bầu trời Thành phố Đà Nẵng
+                </p>
+                <div class="text-xs text-gray-400 pt-4 border-t border-green-800">
+                    © Trang tin Truyền thống Lịch sử Quân đội Nhân dân Việt Nam
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- SCRIPT CHẠY HIỆU ỨNG CANVAS VÙNG TRỜI & PHÒNG KHÔNG -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('airDefenseCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Tạo các điểm sao trên bầu trời đêm
+            const stars = [];
+            for (let i = 0; i < 80; i++) {
+                stars.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    radius: Math.random() * 1.5,
+                    alpha: Math.random() * 0.8 + 0.2,
+                    speed: Math.random() * 0.02
+                });
+            }
+
+            let angle = 0;
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Vẽ các ngôi sao nhấp nháy
+                stars.forEach(star => {
+                    star.alpha += star.speed;
+                    if (star.alpha > 1 || star.alpha < 0.2) star.speed = -star.speed;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // Vẽ vòng tròn Ra-đa ở góc dưới bên phải
+                const radarX = canvas.width - 120;
+                const radarY = canvas.height - 120;
+                const radarR = 80;
+
+                ctx.strokeStyle = 'rgba(0, 255, 128, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(radarX, radarY, radarR, 0, Math.PI * 2);
+                ctx.arc(radarX, radarY, radarR * 0.6, 0, Math.PI * 2);
+                ctx.arc(radarX, radarY, radarR * 0.3, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Quét rada
+                ctx.save();
+                ctx.translate(radarX, radarY);
+                ctx.rotate(angle);
+                ctx.fillStyle = 'rgba(0, 255, 128, 0.15)';
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radarR, 0, Math.PI / 4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+
+                angle += 0.02;
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        });
+    </script>
+</body>
+</html>
